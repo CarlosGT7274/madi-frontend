@@ -77,6 +77,13 @@ export default function NominasPage() {
 
   const accionesRapidas = [
     {
+      titulo: "Calcular desde Planeaciones",
+      descripcion: "Calcular nómina con horas de planeaciones",
+      icono: TrendingUp,
+      color: "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
+      ruta: "/dashboard/nominas/calcular-desde-planeacion/1"
+    },
+    {
       titulo: "Nuevo Empleado",
       descripcion: "Registrar un nuevo empleado",
       icono: Users,
@@ -91,11 +98,18 @@ export default function NominasPage() {
       ruta: "/dashboard/nominas/periodos"
     },
     {
+      titulo: "Ver Empleados",
+      descripcion: "Gestionar empleados y tarifas",
+      icono: Users,
+      color: "bg-indigo-600 hover:bg-indigo-700",
+      ruta: "/dashboard/nominas/empleados"
+    },
+    {
       titulo: "Calcular Nómina",
       descripcion: "Calcular nómina del periodo actual",
       icono: DollarSign,
       color: "bg-purple-600 hover:bg-purple-700",
-      ruta: "/dashboard/nominas/calcular"
+      ruta: "/dashboard/nominas/calcular/1"
     },
     {
       titulo: "Ver Reportes",
@@ -158,7 +172,7 @@ export default function NominasPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Acciones Rápidas
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {accionesRapidas.map((accion, index) => {
               const Icono = accion.icono;
               return (

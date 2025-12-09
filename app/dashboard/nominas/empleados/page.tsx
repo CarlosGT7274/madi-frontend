@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { usersAll } from "@/utils/api/users";
 import {
   Users,
   Plus,
@@ -10,145 +11,69 @@ import {
   Eye,
   UserCheck,
   UserX,
-  Filter
+  Filter,
+  Loader2
 } from "lucide-react";
 
 interface Empleado {
   id: number;
-  numero_empleado: string;
   nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  puesto: {
-    id: number;
-    nombre: string;
-    color: string;
-  };
-  salario_diario: number;
-  fecha_ingreso: string;
-  activo: boolean;
-  estado_asignacion: "disponible" | "ocupado";
-  planta_asignada?: {
+  email?: string;
+  puesto?: string;
+  rol?: {
     id: number;
     nombre: string;
   };
+  activo?: boolean;
+  precio_hora?: number;
 }
+
+// Mapeo de roles a colores
+const COLORES_PUESTO: Record<string, string> = {
+  "Supervisor": "#3b82f6",
+  "Obrero": "#10b981",
+  "Ingeniero": "#8b5cf6",
+  "Técnico": "#f59e0b",
+  "Administrativo": "#ec4899",
+  "default": "#6b7280"
+};
 
 export default function EmpleadosPage() {
   const router = useRouter();
-  const [empleados, setEmpleados] = useState<Empleado[]>([
-    {
-      id: 1,
-      numero_empleado: "EMP-001",
-      nombre: "Juan Carlos",
-      apellido_paterno: "Pérez",
-      apellido_materno: "García",
-      puesto: {
-        id: 1,
-        nombre: "Supervisor",
-        color: "#3b82f6"
-      },
-      salario_diario: 850.00,
-      fecha_ingreso: "2023-01-15",
-      activo: true,
-      estado_asignacion: "ocupado",
-      planta_asignada: {
-        id: 1,
-        nombre: "Planta Norte"
-      }
-    },
-    {
-      id: 2,
-      numero_empleado: "EMP-002",
-      nombre: "María Elena",
-      apellido_paterno: "Rodríguez",
-      apellido_materno: "López",
-      puesto: {
-        id: 2,
-        nombre: "Obrero",
-        color: "#10b981"
-      },
-      salario_diario: 450.00,
-      fecha_ingreso: "2023-03-20",
-      activo: true,
-      estado_asignacion: "disponible"
-    },
-    {
-      id: 3,
-      numero_empleado: "EMP-003",
-      nombre: "Pedro Antonio",
-      apellido_paterno: "Martínez",
-      apellido_materno: "Hernández",
-      puesto: {
-        id: 3,
-        nombre: "Ingeniero",
-        color: "#8b5cf6"
-      },
-      salario_diario: 1200.00,
-      fecha_ingreso: "2022-11-10",
-      activo: true,
-      estado_asignacion: "ocupado",
-      planta_asignada: {
-        id: 2,
-        nombre: "Planta Sur"
-      }
-    },
-    {
-      id: 4,
-      numero_empleado: "EMP-004",
-      nombre: "Ana Sofía",
-      apellido_paterno: "González",
-      apellido_materno: "Ramírez",
-      puesto: {
-        id: 2,
-        nombre: "Obrero",
-        color: "#10b981"
-      },
-      salario_diario: 450.00,
-      fecha_ingreso: "2024-01-05",
-      activo: true,
-      estado_asignacion: "disponible"
-    },
-    {
-      id: 5,
-      numero_empleado: "EMP-005",
-      nombre: "Luis Miguel",
-      apellido_paterno: "Sánchez",
-      apellido_materno: "Torres",
-      puesto: {
-        id: 1,
-        nombre: "Supervisor",
-        color: "#3b82f6"
-      },
-      salario_diario: 850.00,
-      fecha_ingreso: "2023-06-12",
-      activo: false,
-      estado_asignacion: "disponible"
-    }
-  ]);
+  const [empleados, setEmpleados] = useState<Empleado[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<"todos" | "activos" | "inactivos">("activos");
   const [filtroAsignacion, setFiltroAsignacion] = useState<"todos" | "disponible" | "ocupado">("todos");
 
+  useEffect(() => {
+    const cargarEmpleados = async () => {
+      try {
+        const usuarios = await usersAll();
+        setEmpleados(usuarios);
+      } catch (error) {
+        console.error("Error cargando empleados:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarEmpleados();
+  }, []);
+
   const empleadosFiltrados = empleados.filter(emp => {
     const matchBusqueda =
       emp.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      emp.apellido_paterno.toLowerCase().includes(busqueda.toLowerCase()) ||
-      emp.apellido_materno.toLowerCase().includes(busqueda.toLowerCase()) ||
-      emp.numero_empleado.toLowerCase().includes(busqueda.toLowerCase()) ||
-      emp.puesto.nombre.toLowerCase().includes(busqueda.toLowerCase());
+      (emp.email && emp.email.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (emp.puesto && emp.puesto.toLowerCase().includes(busqueda.toLowerCase()));
 
     const matchEstado =
       filtroEstado === "todos" ||
-      (filtroEstado === "activos" && emp.activo) ||
-      (filtroEstado === "inactivos" && !emp.activo);
+      (filtroEstado === "activos" && emp.activo !== false) ||
+      (filtroEstado === "inactivos" && emp.activo === false);
 
-    const matchAsignacion =
-      filtroAsignacion === "todos" ||
-      emp.estado_asignacion === filtroAsignacion;
-
-    return matchBusqueda && matchEstado && matchAsignacion;
+    return matchBusqueda && matchEstado;
   });
 
   const handleEliminar = (id: number) => {
