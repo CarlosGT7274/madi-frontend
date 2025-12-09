@@ -7,45 +7,33 @@ import {
   Plus,
   Search,
   Edit,
-  Trash2,
   Eye,
   UserCheck,
-  UserX,
-  Filter,
-  Loader2
+  Loader2,
+  DollarSign
 } from "lucide-react";
 
-interface Empleado {
-  id: number;
-  nombre: string;
-  email?: string;
-  puesto?: string;
-  rol?: {
-    id: number;
-    nombre: string;
-  };
-  activo?: boolean;
-  precio_hora?: number;
-}
-
 // Mapeo de roles a colores
-const COLORES_PUESTO: Record<string, string> = {
+const COLORES_ROL: Record<string, string> = {
   "Supervisor": "#3b82f6",
   "Obrero": "#10b981",
   "Ingeniero": "#8b5cf6",
   "Técnico": "#f59e0b",
   "Administrativo": "#ec4899",
+  "Empleado": "#10b981",
   "default": "#6b7280"
+};
+
+const getColorRol = (rolNombre?: string): string => {
+  if (!rolNombre) return COLORES_ROL.default;
+  return COLORES_ROL[rolNombre] || COLORES_ROL.default;
 };
 
 export default function EmpleadosPage() {
   const router = useRouter();
-  const [empleados, setEmpleados] = useState<Empleado[]>([]);
+  const [empleados, setEmpleados] = useState<Allusers[]>([]);
   const [cargando, setCargando] = useState(true);
-
   const [busqueda, setBusqueda] = useState("");
-  const [filtroEstado, setFiltroEstado] = useState<"todos" | "activos" | "inactivos">("activos");
-  const [filtroAsignacion, setFiltroAsignacion] = useState<"todos" | "disponible" | "ocupado">("todos");
 
   useEffect(() => {
     const cargarEmpleados = async () => {
@@ -65,30 +53,19 @@ export default function EmpleadosPage() {
   const empleadosFiltrados = empleados.filter(emp => {
     const matchBusqueda =
       emp.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (emp.email && emp.email.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (emp.puesto && emp.puesto.toLowerCase().includes(busqueda.toLowerCase()));
+      emp.correo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (emp.rol?.nombre && emp.rol.nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
-    const matchEstado =
-      filtroEstado === "todos" ||
-      (filtroEstado === "activos" && emp.activo !== false) ||
-      (filtroEstado === "inactivos" && emp.activo === false);
-
-    return matchBusqueda && matchEstado;
+    return matchBusqueda;
   });
 
-  const handleEliminar = (id: number) => {
-    if (confirm("¿Estás seguro de dar de baja a este empleado?")) {
-      setEmpleados(empleados.map(emp =>
-        emp.id === id ? { ...emp, activo: false } : emp
-      ));
-    }
-  };
-
-  const handleActivar = (id: number) => {
-    setEmpleados(empleados.map(emp =>
-      emp.id === id ? { ...emp, activo: true } : emp
-    ));
-  };
+  if (cargando) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="animate-spin text-blue-600" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -99,11 +76,11 @@ export default function EmpleadosPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Empleados</h1>
               <p className="text-gray-500 mt-2">
-                Gestiona los empleados y sus asignaciones
+                Gestiona los empleados del sistema
               </p>
             </div>
             <button
-              onClick={() => router.push("/dashboard/nominas/empleados/nuevo")}
+              onClick={() => router.push("/dashboard/seguridad/usuarios/create")}
               className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-all"
             >
               <Plus size={20} />
@@ -111,65 +88,40 @@ export default function EmpleadosPage() {
             </button>
           </div>
 
-          {/* Filtros y Búsqueda */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Búsqueda */}
-            <div className="md:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Buscar empleado..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Filtro Estado */}
-            <select
-              value={filtroEstado}
-              onChange={(e) => setFiltroEstado(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="todos">Todos los estados</option>
-              <option value="activos">Activos</option>
-              <option value="inactivos">Inactivos</option>
-            </select>
-
-            {/* Filtro Asignación */}
-            <select
-              value={filtroAsignacion}
-              onChange={(e) => setFiltroAsignacion(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="todos">Todas las asignaciones</option>
-              <option value="disponible">Disponibles</option>
-              <option value="ocupado">Ocupados</option>
-            </select>
+          {/* Búsqueda */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Buscar por nombre, correo o rol..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
 
-          {/* Estadísticas rápidas */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          {/* Estadísticas */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-600 font-medium">Total</p>
               <p className="text-2xl font-bold text-blue-900">{empleados.length}</p>
             </div>
             <div className="bg-green-50 p-4 rounded-lg">
-              <p className="text-sm text-green-600 font-medium">Activos</p>
+              <p className="text-sm text-green-600 font-medium">Filtrados</p>
               <p className="text-2xl font-bold text-green-900">
-                {empleados.filter(e => e.activo).length}
+                {empleadosFiltrados.length}
               </p>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg">
-              <p className="text-sm text-red-600 font-medium">Ocupados</p>
-              <p className="text-2xl font-bold text-red-900">
-                {empleados.filter(e => e.estado_asignacion === "ocupado").length}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-sm text-purple-600 font-medium">Roles Únicos</p>
+              <p className="text-2xl font-bold text-purple-900">
+                {new Set(empleados.map(e => e.rol?.nombre).filter(Boolean)).size}
               </p>
             </div>
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <p className="text-sm text-yellow-600 font-medium">Disponibles</p>
-              <p className="text-2xl font-bold text-yellow-900">
-                {empleados.filter(e => e.estado_asignacion === "disponible").length}
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <p className="text-sm text-orange-600 font-medium">Con Email</p>
+              <p className="text-2xl font-bold text-orange-900">
+                {empleados.filter(e => e.correo).length}
               </p>
             </div>
           </div>
@@ -185,19 +137,13 @@ export default function EmpleadosPage() {
                     Empleado
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Puesto
+                    Correo
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Salario Diario
+                    Rol
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Asignación
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha Ingreso
+                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Precio/Hora
                   </th>
                   <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Acciones
@@ -214,94 +160,55 @@ export default function EmpleadosPage() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {empleado.nombre} {empleado.apellido_paterno} {empleado.apellido_materno}
+                            {empleado.nombre}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {empleado.numero_empleado}
+                            ID: {empleado.id}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white"
-                        style={{ backgroundColor: empleado.puesto.color }}
-                      >
-                        {empleado.puesto.nombre}
-                      </span>
+                      <div className="text-sm text-gray-900">{empleado.correo}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">
-                        ${empleado.salario_diario.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      {empleado.rol ? (
+                        <span
+                          className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white"
+                          style={{ backgroundColor: getColorRol(empleado.rol.nombre) }}
+                        >
+                          {empleado.rol.nombre}
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-200 text-gray-700">
+                          Sin rol
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="text-sm font-semibold text-green-600 flex items-center justify-center gap-1">
+                        <DollarSign size={14} />
+                        {/* Esto debería venir de la BD - por ahora valor por defecto */}
+                        150
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {empleado.activo ? (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          <UserCheck size={14} className="mr-1" />
-                          Activo
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                          <UserX size={14} className="mr-1" />
-                          Inactivo
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {empleado.estado_asignacion === "ocupado" ? (
-                        <div>
-                          <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                            Ocupado
-                          </span>
-                          {empleado.planta_asignada && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {empleado.planta_asignada.nombre}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Disponible
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(empleado.fecha_ingreso).toLocaleDateString('es-MX')}
+                      <div className="text-xs text-gray-400">Por configurar</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => router.push(`/dashboard/nominas/empleados/${empleado.id}`)}
+                          onClick={() => router.push(`/dashboard/seguridad/usuarios/${empleado.id}`)}
                           className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded transition-all"
                           title="Ver detalles"
                         >
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => router.push(`/dashboard/nominas/empleados/${empleado.id}`)}
+                          onClick={() => router.push(`/dashboard/seguridad/usuarios/${empleado.id}`)}
                           className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-all"
                           title="Editar"
                         >
                           <Edit size={18} />
                         </button>
-                        {empleado.activo ? (
-                          <button
-                            onClick={() => handleEliminar(empleado.id)}
-                            className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded transition-all"
-                            title="Dar de baja"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleActivar(empleado.id)}
-                            className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-all"
-                            title="Activar"
-                          >
-                            <UserCheck size={18} />
-                          </button>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -317,10 +224,24 @@ export default function EmpleadosPage() {
                 No se encontraron empleados
               </h3>
               <p className="text-gray-500 mb-6">
-                Intenta ajustar los filtros o crea un nuevo empleado
+                {busqueda ? "Intenta ajustar tu búsqueda" : "Aún no hay empleados registrados"}
               </p>
             </div>
           )}
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-6">
+          <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+            <UserCheck size={20} />
+            Información
+          </h3>
+          <ul className="text-sm text-blue-800 space-y-2">
+            <li>• Los empleados se gestionan desde <strong>Seguridad → Usuarios</strong></li>
+            <li>• El <strong>precio por hora</strong> se debe configurar en la base de datos</li>
+            <li>• Agrega el campo: <code className="bg-blue-100 px-2 py-1 rounded">ALTER TABLE usuarios ADD precio_hora DECIMAL(10,2) DEFAULT 150</code></li>
+            <li>• Las horas trabajadas se toman de las <strong>planeaciones aprobadas</strong></li>
+          </ul>
         </div>
       </div>
     </div>

@@ -1,8 +1,10 @@
 import { post, get, del, patch } from "../http";
 
 // ==========================================
-// EMPLEADOS
+// EMPLEADOS (usar usersAll de users.ts)
 // ==========================================
+// NOTA: Los empleados se gestionan desde usuarios
+// Usar: import { usersAll, getOneUser } from "@/utils/api/users"
 
 export const crearEmpleado = async (data: {
   numero_empleado: string;
@@ -22,7 +24,7 @@ export const crearEmpleado = async (data: {
   salario_diario: number;
   fecha_ingreso: string;
 }) => {
-  return await post("nominas/empleados", data);
+  return await post("ingenierias/nominas/empleados", data);
 };
 
 export const obtenerEmpleados = async (filtros?: {
@@ -35,11 +37,11 @@ export const obtenerEmpleados = async (filtros?: {
   if (filtros?.puesto_id) params.append("puesto_id", String(filtros.puesto_id));
   if (filtros?.estado_asignacion) params.append("estado_asignacion", filtros.estado_asignacion);
 
-  return await get(`nominas/empleados?${params.toString()}`);
+  return await get(`ingenierias/nominas/empleados?${params.toString()}`);
 };
 
 export const obtenerEmpleadoPorId = async (id: number) => {
-  return await get(`nominas/empleados/${id}`);
+  return await get(`ingenierias/nominas/empleados/${id}`);
 };
 
 export const actualizarEmpleado = async (id: number, data: {
@@ -76,7 +78,7 @@ export const activarEmpleado = async (id: number) => {
 // ==========================================
 
 export const obtenerPuestos = async () => {
-  return await get("nominas/puestos");
+  return await get("ingenierias/nominas/puestos");
 };
 
 export const crearPuesto = async (data: {
@@ -86,7 +88,7 @@ export const crearPuesto = async (data: {
   salario_base_maximo?: number;
   color: string;
 }) => {
-  return await post("nominas/puestos", data);
+  return await post("ingenierias/nominas/puestos", data);
 };
 
 // ==========================================
@@ -99,7 +101,7 @@ export const asignarEmpleadoAPlanta = async (data: {
   actividad_id?: number;
   fecha_asignacion: string;
 }) => {
-  return await post("nominas/asignaciones", data);
+  return await post("ingenierias/nominas/asignaciones", data);
 };
 
 export const desasignarEmpleadoDePlanta = async (asignacion_id: number, fecha_desasignacion: string) => {
@@ -124,7 +126,7 @@ export const crearPeriodoNomina = async (data: {
   fecha_fin: string;
   fecha_pago: string;
 }) => {
-  return await post("nominas/periodos", data);
+  return await post("ingenierias/nominas/periodos", data);
 };
 
 export const obtenerPeriodosNomina = async (filtros?: {
@@ -164,7 +166,7 @@ export const registrarAsistencia = async (data: {
   actividad_id?: number;
   notas?: string;
 }) => {
-  return await post("nominas/asistencias", data);
+  return await post("ingenierias/nominas/asistencias", data);
 };
 
 export const obtenerAsistenciasPorEmpleado = async (
@@ -262,7 +264,7 @@ export const crearPrestamoEmpleado = async (data: {
   numero_pagos_total: number;
   descripcion?: string;
 }) => {
-  return await post("nominas/prestamos", data);
+  return await post("ingenierias/nominas/prestamos", data);
 };
 
 export const obtenerPrestamosPorEmpleado = async (empleado_id: number, activo?: boolean) => {
