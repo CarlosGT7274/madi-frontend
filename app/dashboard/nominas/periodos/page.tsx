@@ -148,7 +148,7 @@ export default function PeriodosNominaPage() {
   };
 
   const handleCalcularNomina = (periodoId: number) => {
-    router.push(`/dashboard/nominas/calcular/${periodoId}`);
+    router.push(`/dashboard/ingenierias/nominas/calcular/${periodoId}`);
   };
 
   return (

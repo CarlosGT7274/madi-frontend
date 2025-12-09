@@ -127,7 +127,7 @@ export default function CalcularNominaPage() {
 
   const handleGuardar = () => {
     alert("Nóminas guardadas exitosamente");
-    router.push("/dashboard/nominas/periodos");
+    router.push("/dashboard/ingenierias/nominas/periodos");
   };
 
   return (

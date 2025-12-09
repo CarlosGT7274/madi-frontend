@@ -143,7 +143,7 @@ export default function DetalleEmpleadoPage() {
               <p className="text-gray-500 mt-1">{empleado.numero_empleado}</p>
             </div>
             <button
-              onClick={() => router.push(`/dashboard/nominas/empleados/${empleadoId}/editar`)}
+              onClick={() => router.push(`/dashboard/ingenierias/nominas/empleados/${empleadoId}/editar`)}
               className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-all"
             >
               <Edit size={20} />

@@ -144,7 +144,7 @@ export default function CalcularNominaDesdePlaneacionPage() {
 
   const handleGuardar = () => {
     alert(`Nómina guardada para la semana ${semana}/${anio}`);
-    router.push("/dashboard/nominas/periodos");
+    router.push("/dashboard/ingenierias/nominas/periodos");
   };
 
   if (cargando) {

@@ -101,7 +101,7 @@ export default function NuevoEmpleadoPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       alert("Empleado creado exitosamente");
-      router.push("/dashboard/nominas/empleados");
+      router.push("/dashboard/ingenierias/nominas/empleados");
     } catch (error) {
       console.error("Error al guardar empleado:", error);
       alert("Error al guardar empleado");
