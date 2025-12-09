@@ -45,21 +45,21 @@ export default function NominasPage() {
       total: estadisticas.totalEmpleados,
       icono: Users,
       color: "bg-blue-500",
-      ruta: "/dashboard/nominas/empleados"
+      ruta: "/dashboard/ingenierias/nominas/empleados"
     },
     {
       titulo: "Nóminas Pendientes",
       valor: estadisticas.nominasPendientes,
       icono: Clock,
       color: "bg-yellow-500",
-      ruta: "/dashboard/nominas/periodos"
+      ruta: "/dashboard/ingenierias/nominas/periodos"
     },
     {
       titulo: "Total a Pagar",
       valor: `$${estadisticas.totalAPagar.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
       icono: DollarSign,
       color: "bg-green-500",
-      ruta: "/dashboard/nominas/calcular"
+      ruta: "/dashboard/ingenierias/nominas/calcular"
     },
     {
       titulo: "Último Periodo",
@@ -71,7 +71,7 @@ export default function NominasPage() {
         : "",
       icono: TrendingUp,
       color: "bg-purple-500",
-      ruta: "/dashboard/nominas/periodos"
+      ruta: "/dashboard/ingenierias/nominas/periodos"
     }
   ];
 
@@ -81,42 +81,42 @@ export default function NominasPage() {
       descripcion: "Calcular nómina con horas de planeaciones",
       icono: TrendingUp,
       color: "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
-      ruta: "/dashboard/nominas/calcular-desde-planeacion/1"
+      ruta: "/dashboard/ingenierias/nominas/calcular-desde-planeacion/1"
     },
     {
       titulo: "Nuevo Empleado",
       descripcion: "Registrar un nuevo empleado",
       icono: Users,
       color: "bg-blue-600 hover:bg-blue-700",
-      ruta: "/dashboard/nominas/empleados/nuevo"
+      ruta: "/dashboard/ingenierias/nominas/empleados/nuevo"
     },
     {
       titulo: "Nuevo Periodo",
       descripcion: "Crear un periodo de nómina",
       icono: Calendar,
       color: "bg-green-600 hover:bg-green-700",
-      ruta: "/dashboard/nominas/periodos"
+      ruta: "/dashboard/ingenierias/nominas/periodos"
     },
     {
       titulo: "Ver Empleados",
       descripcion: "Gestionar empleados y tarifas",
       icono: Users,
       color: "bg-indigo-600 hover:bg-indigo-700",
-      ruta: "/dashboard/nominas/empleados"
+      ruta: "/dashboard/ingenierias/nominas/empleados"
     },
     {
       titulo: "Calcular Nómina",
       descripcion: "Calcular nómina del periodo actual",
       icono: DollarSign,
       color: "bg-purple-600 hover:bg-purple-700",
-      ruta: "/dashboard/nominas/calcular/1"
+      ruta: "/dashboard/ingenierias/nominas/calcular/1"
     },
     {
       titulo: "Ver Reportes",
       descripcion: "Consultar reportes de nóminas",
       icono: FileText,
       color: "bg-orange-600 hover:bg-orange-700",
-      ruta: "/dashboard/nominas/reportes"
+      ruta: "/dashboard/ingenierias/nominas/reportes"
     }
   ];
 
